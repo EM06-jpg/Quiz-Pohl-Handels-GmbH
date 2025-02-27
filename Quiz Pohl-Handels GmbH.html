@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz der Pohl-Handels GmbH</title>
+  <!-- Google Font: Montserrat -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* Basis – Originales Design */
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: radial-gradient(circle at center, #ffffff, #f0faff, #e6f7ff);
+      color: #333;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+      transition: background 0.5s ease;
+    }
+    header h1 {
+      background-color: rgba(0, 51, 102, 0.85);
+      color: #fff;
+      padding: 20px;
+      margin: 0;
+      font-size: 2.5em;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      transition: transform 0.3s ease;
+    }
+    header h1:hover {
+      transform: scale(1.02);
+    }
+    /* Bereiche */
+    #login, #welcome, #name-form-section, #quiz, #results {
+      margin: 30px auto;
+      padding: 20px;
+      background-color: rgba(255,255,255,0.95);
+      border-radius: 10px;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      animation: fadeIn 0.5s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .logo {
+      display: block;
+      margin: 20px auto;
+      max-width: 60%;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease;
+    }
+    .logo:hover {
+      transform: scale(1.05);
+    }
+    .button-container {
+      margin-top: 20px;
+    }
+    button {
+      background-color: #27ae60;
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1.2em;
+      cursor: pointer;
+      margin: 10px;
+      border-radius: 5px;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+    button:hover {
+      background-color: #2ecc71;
+      transform: scale(1.05);
+    }
+    .answers {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    .answer-option {
+      margin: 5px 10px;
+      display: inline-flex;
+      align-items: center;
+    }
+    .answer-option input[type="radio"] {
+      margin-right: 5px;
+    }
+    table {
+      margin: 20px auto;
+      border-collapse: collapse;
+      width: 90%;
+      max-width: 500px;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+    .results-buttons {
+      margin-top: 20px;
+    }
+    footer {
+      background-color: rgba(0, 51, 102, 0.85);
+      color: #fff;
+      padding: 10px;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      text-align: center;
+    }
+    /* Zusätzliche Features */
+    /* Timer – oben rechts */
+    #stopwatch {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.6);
+      color: #fff;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 1.2em;
+      display: none;
+    }
+    /* Fortschrittsbalken */
+    #progress-container {
+      width: 90%;
+      max-width: 600px;
+      height: 20px;
+      background-color: #ddd;
+      border-radius: 10px;
+      margin: 20px auto;
+      overflow: hidden;
+    }
+    #progress-bar {
+      height: 100%;
+      width: 0;
+      background-color: #e74c3c;
+      transition: width 0.5s ease, background-color 0.5s ease;
+    }
+    /* Donut-Kreis */
+    #progress-circle {
+      margin: 20px auto;
+      position: relative;
+      width: 150px;
+      height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #progress-circle svg {
+      transform: rotate(-90deg);
+    }
+    #progress-ring {
+      transition: stroke-dashoffset 0.5s ease;
+    }
+    #progress-text {
+      position: absolute;
+      font-size: 1.5em;
+      color: #27ae60;
+    }
+    #results-table-container {
+      margin-top: 30px;
+    }
+    /* Dark/Light Mode Toggle – unten rechts */
+    #mode-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 5px 10px;
+      font-size: 1em;
+      cursor: pointer;
+      background-color: #27ae60;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+      z-index: 1000;
+    }
+    #mode-toggle:hover {
+      background-color: #2ecc71;
+    }
+    /* Mini Game Button – unten links */
+    #mini-game-btn {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      padding: 10px 15px;
+      font-size: 1em;
+      cursor: pointer;
+      background-color: #e67e22;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      z-index: 10000;
+    }
+    /* Easter Egg */
+    #easter-egg {
+      display: none;
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      background: #ffeb3b;
+      color: #333;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    /* Animationen */
+    .fade-in {
+      animation: fadeInQuestion 0.5s ease;
+    }
+    @keyframes fadeInQuestion {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .correct-answer {
+      animation: correctAnimation 0.5s ease;
+    }
+    @keyframes correctAnimation {
+      0% { background-color: transparent; }
+      50% { background-color: #d4edda; }
+      100% { background-color: transparent; }
+    }
+    .incorrect-answer {
+      animation: incorrectAnimation 0.5s ease;
+    }
+    @keyframes incorrectAnimation {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      50% { transform: translateX(10px); }
+      75% { transform: translateX(-10px); }
+      100% { transform: translateX(0); }
+    }
+    /* Leaderboard */
+    #leaderboard {
+      margin-top: 20px;
+    }
+    #leaderboard table {
+      margin: 10px auto;
+      width: 90%;
+      max-width: 400px;
+    }
+    /* Responsive Anpassungen */
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 2em;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 1em;
+      }
+      #stopwatch {
+        font-size: 1em;
+        padding: 4px 8px;
+      }
+    }
+    /* Dark Mode Styles – Überschreibe Bereiche */
+    .dark-mode {
+      background: #2c3e50;
+      color: #ecf0f1;
+    }
+    .dark-mode header h1 {
+      background-color: rgba(0, 51, 102, 0.85);
+    }
+    .dark-mode #login,
+    .dark-mode #welcome,
+    .dark-mode #name-form-section,
+    .dark-mode #quiz,
+    .dark-mode #results {
+      background-color: #34495e;
+      color: #ecf0f1;
+    }
+    .dark-mode footer {
+      background-color: rgba(0, 51, 102, 0.85);
+    }
+    .dark-mode #mode-toggle {
+      background-color: #2980b9;
+    }
+    .dark-mode #mode-toggle:hover {
+      background-color: #3498db;
+    }
+    .dark-mode #mini-game-btn {
+      background-color: #e67e22;
+    }
+  </style>
+  <!-- Konfetti-Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+  <!-- Login-Bereich -->
+  <section id="login">
+    <h2>Login – Nur für Mitarbeiter</h2>
+    <form id="login-form" onsubmit="loginUser(event)">
+      <input type="text" id="login-username" placeholder="Benutzername" required>
+      <br><br>
+      <input type="password" id="login-password" placeholder="Passwort" required>
+      <br><br>
+      <button type="submit">Einloggen</button>
+    </form>
+  </section>
+
+  <header style="display:none;">
+    <h1 id="header-title">Willkommen beim Quiz der Pohl-Handels GmbH!</h1>
+    <div id="stopwatch">00:00</div>
+  </header>
+
+  <main style="display:none;">
+    <!-- Willkommensbereich -->
+    <section id="welcome">
+      <img src="Pohl-Logo.png" alt="Pohl Handels GmbH Logo" class="logo">
+      <div class="button-container">
+        <button onclick="startQuiz()">Zum Quiz!</button>
+        <button onclick="showResultsSection()">Zu den Ergebnissen</button>
+      </div>
+    </section>
+    <!-- Namenseingabe -->
+    <section id="name-form-section" style="display:none;">
+      <h2>Gib bitte deinen Namen ein, um zu starten:</h2>
+      <form id="name-input-form" onsubmit="startQuizQuestions(event)">
+        <input type="text" id="name" placeholder="Dein Name" required>
+        <button type="submit">Starten</button>
+      </form>
+    </section>
+    <!-- Quizbereich -->
+    <section id="quiz" style="display:none;">
+      <!-- Fortschrittsbalken -->
+      <div id="progress-container">
+        <div id="progress-bar"></div>
+      </div>
+      <div id="question-container">
+        <!-- Fragen werden hier dynamisch erzeugt -->
+      </div>
+      <button id="next-btn" onclick="nextQuestion()">Weiter</button>
+    </section>
+    <!-- Ergebnisanzeige -->
+    <section id="results" style="display:none;">
+      <h2>Ergebnisse:</h2>
+      <p id="score"></p>
+      <div id="badge"></div>
+      <!-- Donut-Kreis -->
+      <div id="progress-circle">
+        <svg width="150" height="150">
+          <circle class="progress-bg" cx="75" cy="75" r="65" stroke="#e74c3c" stroke-width="10" fill="none"/>
+          <circle id="progress-ring" cx="75" cy="75" r="65" stroke="#27ae60" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="408" stroke-dashoffset="408"/>
+        </svg>
+        <div id="progress-text">0%</div>
+      </div>
+      <!-- Social Share Buttons -->
+      <div id="social-share">
+        <p>Teile dein Ergebnis:</p>
+        <button onclick="shareResult('twitter')">Twitter</button>
+        <button onclick="shareResult('facebook')">Facebook</button>
+        <button onclick="shareResult('whatsapp')">WhatsApp</button>
+      </div>
+      <div id="results-table-container"></div>
+      <!-- Leaderboard -->
+      <div id="leaderboard">
+        <h3>Leaderboard</h3>
+        <div id="leaderboard-table"></div>
+      </div>
+      <div class="results-buttons">
+        <button onclick="backToWelcome()">Zurück</button>
+        <button onclick="resetResults()">Ergebnisse zurücksetzen</button>
+      </div>
+    </section>
+    <!-- Easter Egg -->
+    <div id="easter-egg">Überraschung! Du hast das Easter Egg gefunden!</div>
+  </main>
+
+  <!-- Dark/Light Mode Toggle – unten rechts -->
+  <button id="mode-toggle" onclick="toggleMode()">Dark/Light Mode</button>
+  <!-- Mini Game Button – unten links -->
+  <button id="mini-game-btn" onclick="openSnakeGame()">Mini Game: Snake</button>
+
+  <footer style="display:none;">
+    <p>Erstellt am 26.02.2025 von Emmanuel Moskios</p>
+  </footer>
+
+  <!-- Snake Game Modal -->
+  <div id="snake-modal" style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;">
+    <div style="position: relative; background: #fff; padding: 20px; border-radius: 10px;">
+      <button onclick="closeSnakeGame()" style="position:absolute; top:10px; right:10px;">Schließen</button>
+      <canvas id="snake-canvas" width="400" height="400" style="border:1px solid #000;"></canvas>
+    </div>
+  </div>
+
+  <!-- Soundeffekte – verwende die heruntergeladenen MP3-Dateien -->
+  <audio id="correct-sound" src="correct-Sound.mp3"></audio>
+  <audio id="incorrect-sound" src="incorrect-Sound.mp3"></audio>
+  <audio id="yay-sound" src="Yaaaay-Sound.mp3"></audio>
+
+  <script>
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let currentUserName = "";
+    let resultsArray = [];
+    let stopwatchInterval = null;
+    let startTime = null;
+    let elapsedTime = 0;
+    let headerClicks = 0;
+
+    if(localStorage.getItem("quizResults")){
+      resultsArray = JSON.parse(localStorage.getItem("quizResults"));
+    }
+
+    const questions = [
+      { question: "1. In welchem Jahr wurde die Pohl Handels GmbH gegründet?", answers: ["2010", "2013", "2015", "2018"], correct: 1 },
+      { question: "2. In welchem Jahr wurde der Online-Shop der Pohl Handels GmbH erstmals gelauncht?", answers: ["2015", "2016", "2017", "2018"], correct: 1 },
+      { question: "3. Welches Zahlungsmittel wird im Online-Shop der Pohl Handels GmbH am häufigsten genutzt?", answers: ["Kreditkarte", "PayPal", "Apple Pay", "Google Pay"], correct: 0 },
+      { question: "4. Liefert die Pohl Handels GmbH international?", answers: ["Ja", "Nein"], correct: 0 },
+      { question: "5. Wie viele Online-Shops betreibt die Pohl Handels GmbH?", answers: ["1", "2", "3", "5"], correct: 1 },
+      { question: "6. Wie lauten die Namen der beiden Online-Shops der Pohl Handels GmbH?", answers: ["Outdoor49 und Bobleisure", "SportShop und OutdoorPlus", "Bobleisure und ShopOnline", "AdventurePro und Bobleisure"], correct: 0 },
+      { question: "7. Welche Versanddienstleister werden von der Pohl Handels GmbH genutzt?", answers: ["DHL, FedEx und UPS", "DHL und Hermes", "UPS und DPD", "Hermes und GLS"], correct: 0 },
+      { question: "8. Welche Art von Produkten verkauft die Pohl Handels GmbH hauptsächlich?", answers: ["Outdoor-Produkte", "Elektronikgeräte", "Spielzeug", "Möbel"], correct: 0 },
+      { question: "9. Welche der folgenden Zahlungsmethoden wird nicht von der Pohl Handels GmbH im Online-Shop akzeptiert?", answers: ["Kreditkarte", "PayPal", "Bitcoin", "Apple Pay"], correct: 2 },
+      { question: "10. Welche der folgenden Plattformen wird von der Pohl Handels GmbH für Werbung genutzt?", answers: ["Instagram", "LinkedIn", "TikTok", "Facebook"], correct: 3 },
+      { question: "11. Welches dieser Produkte wird NICHT von der Pohl Handels GmbH angeboten?", answers: ["Zelte", "Wanderschuhe", "Schlafsäcke", "Smartphones"], correct: 3 },
+      { question: "12. Welche Hauptsprache wird auf der Webseite der Pohl Handels GmbH verwendet?", answers: ["Deutsch", "Englisch", "Spanisch", "Französisch"], correct: 1 },
+      { question: "13. Welche Zielgruppe spricht die Pohl Handels GmbH hauptsächlich an?", answers: ["Outdoor-Enthusiasten", "Haustierbesitzer", "Hobbyköche", "Technikliebhaber"], correct: 0 },
+      { question: "14. Welche Outdoor-Aktivität wird durch das Produktsortiment der Pohl Handels GmbH besonders unterstützt?", answers: ["Camping & Wandern", "Motorsport", "Angeln", "Reiten"], correct: 0 },
+      { question: "15. Wo befindet sich der Firmensitz der Pohl Handels GmbH?", answers: ["Deutschland", "Österreich", "Schweiz", "Niederlande"], correct: 0 },
+      { question: "16. Wie können Kunden den Kundenservice der Pohl Handels GmbH erreichen?", answers: ["Nur per Telefon", "Per Telefon, E-Mail und Kontaktformular", "Nur über Social Media", "Persönlich im Geschäft"], correct: 1 },
+      { question: "17. Welche Versandoptionen bietet die Pohl Handels GmbH ihren Kunden an?", answers: ["Standardversand, Expressversand", "Expressversand", "Same-Day-Delivery", "Nur Abholung vor Ort"], correct: 0 },
+      { question: "18. Welche dieser Produktkategorien bietet die Pohl Handels GmbH an?", answers: ["Campingausrüstung", "Haushaltsgeräte", "Kosmetik", "Musikinstrumente"], correct: 0 },
+      { question: "19. Welche dieser Sportarten wird durch das Sortiment der Pohl Handels GmbH besonders unterstützt?", answers: ["Wandern", "Motorsport", "Tennis", "Golf"], correct: 0 },
+      { question: "20. In welcher Jahreszeit erzielt die Pohl Handels GmbH die meisten Verkäufe?", answers: ["Frühling", "Sommer", "Herbst", "Winter"], correct: 3 }
+    ];
+
+    // Login-Funktion
+    function loginUser(event){
+      event.preventDefault();
+      const username = document.getElementById("login-username").value;
+      const password = document.getElementById("login-password").value;
+      if(username === "pohl" && password === "pohl123"){
+        document.getElementById("login").style.display = "none";
+        document.querySelector("header").style.display = "block";
+        document.querySelector("main").style.display = "block";
+        document.querySelector("footer").style.display = "block";
+      } else {
+        alert("Falsche Zugangsdaten!");
+      }
+    }
+
+    function startQuiz(){
+      document.getElementById("welcome").style.display = "none";
+      document.getElementById("name-form-section").style.display = "block";
+    }
+
+    function startQuizQuestions(event){
+      event.preventDefault();
+      currentUserName = document.getElementById("name").value;
+      document.getElementById("name-form-section").style.display = "none";
+      document.getElementById("quiz").style.display = "block";
+      document.getElementById("stopwatch").style.display = "block";
+      startTime = Date.now();
+      stopwatchInterval = setInterval(updateStopwatch, 1000);
+      updateProgressBar();
+      displayQuestion();
+    }
+
+    function updateStopwatch(){
+      elapsedTime = Date.now() - startTime;
+      document.getElementById("stopwatch").textContent = formatTime(elapsedTime);
+    }
+
+    function formatTime(ms){
+      let totalSeconds = Math.floor(ms / 1000);
+      let minutes = Math.floor(totalSeconds / 60);
+      let seconds = totalSeconds % 60;
+      return (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
+    }
+
+    function updateProgressBar(){
+      let progressPercent = (currentQuestionIndex / questions.length) * 100;
+      let progressBar = document.getElementById("progress-bar");
+      progressBar.style.width = progressPercent + "%";
+      if(progressPercent < 50){
+        progressBar.style.backgroundColor = "#e74c3c";
+      } else if(progressPercent < 80){
+        progressBar.style.backgroundColor = "#f39c12";
+      } else {
+        progressBar.style.backgroundColor = "#27ae60";
+      }
+    }
+
+    function displayQuestion(){
+      const q = questions[currentQuestionIndex];
+      let html = `<h2 class="fade-in">${q.question}</h2><div class="answers fade-in">`;
+      q.answers.forEach((ans, idx) => {
+        html += `<span class="answer-option">
+                   <input type="radio" name="answer" value="${idx}" id="answer${idx}">
+                   <label for="answer${idx}">${ans}</label>
+                 </span>`;
+      });
+      html += "</div>";
+      document.getElementById("question-container").innerHTML = html;
+    }
+
+    function nextQuestion(){
+      const selected = document.querySelector('input[name="answer"]:checked');
+      if(selected){
+        const idx = parseInt(selected.value);
+        if(idx === questions[currentQuestionIndex].correct){
+          score++;
+          document.getElementById("correct-sound").play();
+          document.getElementById("question-container").classList.add("correct-answer");
+        } else {
+          document.getElementById("incorrect-sound").play();
+          document.getElementById("question-container").classList.add("incorrect-answer");
+        }
+        setTimeout(() => {
+          document.getElementById("question-container").classList.remove("correct-answer", "incorrect-answer");
+          currentQuestionIndex++;
+          updateProgressBar();
+          if(currentQuestionIndex < questions.length){
+            displayQuestion();
+          } else {
+            showResults();
+          }
+        }, 500);
+      } else {
+        alert("Bitte wähle eine Antwort aus!");
+      }
+    }
+
+    function showResults(){
+      clearInterval(stopwatchInterval);
+      document.getElementById("quiz").style.display = "none";
+      document.getElementById("results").style.display = "block";
+      let finalTime = formatTime(elapsedTime);
+      document.getElementById("score").innerHTML = `Hallo ${currentUserName}, du hast ${score} von ${questions.length} Fragen richtig beantwortet!<br>Deine Zeit: ${finalTime}`;
+
+      if(score === questions.length){
+        document.getElementById("badge").innerHTML = `<p>Glückwunsch! Perfekter Score <span style="font-size:2em;">🏆</span></p>`;
+      } else {
+        document.getElementById("badge").innerHTML = "";
+      }
+
+      resultsArray.push({name: currentUserName, score: score, time: finalTime});
+      localStorage.setItem("quizResults", JSON.stringify(resultsArray));
+      updateProgressCircle();
+      displayResultsTable();
+      displayLeaderboard();
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+      document.getElementById("yay-sound").play();
+    }
+
+    function updateProgressCircle(){
+      const percentage = (score / questions.length) * 100;
+      const circle = document.getElementById("progress-ring");
+      const text = document.getElementById("progress-text");
+      const radius = circle.r.baseVal.value;
+      const circumference = 2 * Math.PI * radius;
+      circle.style.strokeDasharray = circumference;
+      const offset = circumference - (percentage / 100) * circumference;
+      circle.style.strokeDashoffset = offset;
+      text.textContent = `${Math.round(percentage)}%`;
+    }
+
+    function displayResultsTable(){
+      let html = `<table border="1" cellspacing="0" cellpadding="5">
+                  <tr><th>Name</th><th>Punkte</th><th>Zeit</th></tr>`;
+      resultsArray.forEach(res => {
+        html += `<tr>
+                   <td>${res.name}</td>
+                   <td>${res.score}</td>
+                   <td>${res.time ? res.time : "00:00"}</td>
+                 </tr>`;
+      });
+      html += "</table>";
+      document.getElementById("results-table-container").innerHTML = html;
+    }
+
+    function displayLeaderboard(){
+      let sorted = [...resultsArray].sort((a, b) => {
+        if(b.score === a.score){
+          return a.time.localeCompare(b.time);
+        }
+        return b.score - a.score;
+      }).slice(0,5);
+      let html = `<table border="1" cellspacing="0" cellpadding="5">
+                  <tr><th>Name</th><th>Punkte</th><th>Zeit</th></tr>`;
+      sorted.forEach(res => {
+        html += `<tr>
+                   <td>${res.name}</td>
+                   <td>${res.score}</td>
+                   <td>${res.time ? res.time : "00:00"}</td>
+                 </tr>`;
+      });
+      html += "</table>";
+      document.getElementById("leaderboard-table").innerHTML = html;
+    }
+
+    function showResultsSection(){
+      document.getElementById("welcome").style.display = "none";
+      document.getElementById("name-form-section").style.display = "none";
+      document.getElementById("quiz").style.display = "none";
+      if(localStorage.getItem("quizResults")){
+        resultsArray = JSON.parse(localStorage.getItem("quizResults"));
+      }
+      displayResultsTable();
+      displayLeaderboard();
+      document.getElementById("results").style.display = "block";
+    }
+
+    function backToWelcome(){
+      document.getElementById("results").style.display = "none";
+      document.getElementById("welcome").style.display = "block";
+      currentQuestionIndex = 0;
+      score = 0;
+      clearInterval(stopwatchInterval);
+      elapsedTime = 0;
+      document.getElementById("stopwatch").textContent = "00:00";
+      document.getElementById("stopwatch").style.display = "none";
+    }
+
+    function resetResults(){
+      const pass = prompt("Bitte geben Sie das Host-Passwort ein:");
+      if(pass === "hostpass"){
+        resultsArray = [];
+        localStorage.setItem("quizResults", JSON.stringify(resultsArray));
+        displayResultsTable();
+        displayLeaderboard();
+        alert("Ergebnisse wurden zurückgesetzt!");
+      } else {
+        alert("Falsches Passwort!");
+      }
+    }
+
+    function toggleMode(){
+      document.body.classList.toggle("dark-mode");
+    }
+
+    // Easter Egg: 7-facher Klick auf den Header
+    document.getElementById("header-title").addEventListener("click", function(){
+      headerClicks++;
+      if(headerClicks >= 7){
+        document.getElementById("easter-egg").style.display = "block";
+        setTimeout(function(){
+          document.getElementById("easter-egg").style.display = "none";
+        }, 5000);
+        headerClicks = 0;
+      }
+    });
+
+    function shareResult(platform){
+      let text = encodeURIComponent(`Ich habe ${score} von ${questions.length} Fragen richtig beantwortet in ${formatTime(elapsedTime)}!`);
+      let url = encodeURIComponent(window.location.href);
+      let shareUrl = "";
+      if(platform === "twitter"){
+        shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
+        window.open(shareUrl, '_blank');
+      } else if(platform === "facebook"){
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+        window.open(shareUrl, '_blank');
+      } else if(platform === "whatsapp"){
+        shareUrl = `https://api.whatsapp.com/send?text=${text} ${url}`;
+        window.open(shareUrl, '_blank');
+      }
+    }
+
+    /* Snake Game Code */
+    function openSnakeGame(){
+      document.getElementById("snake-modal").style.display = "flex";
+      startSnakeGame();
+    }
+
+    function closeSnakeGame(){
+      document.getElementById("snake-modal").style.display = "none";
+      let canvas = document.getElementById('snake-canvas');
+      let ctx = canvas.getContext('2d');
+      ctx.clearRect(0,0, canvas.width, canvas.height);
+    }
+
+    function startSnakeGame(){
+      var canvas = document.getElementById('snake-canvas');
+      var ctx = canvas.getContext('2d');
+      var grid = 20;
+      var count = 0;
+      var snake = { x: 160, y: 160, cells: [], maxCells: 4 };
+      var food = { x: 320, y: 320 };
+      var dx = grid;
+      var dy = 0;
+
+      function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min)) + min;
+      }
+
+      function gameLoop() {
+        requestAnimationFrame(gameLoop);
+        if(++count < 4) {
+          return;
+        }
+        count = 0;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        snake.x += dx;
+        snake.y += dy;
+
+        if(snake.x < 0) {
+          snake.x = canvas.width - grid;
+        } else if(snake.x >= canvas.width) {
+          snake.x = 0;
+        }
+
+        if(snake.y < 0) {
+          snake.y = canvas.height - grid;
+        } else if(snake.y >= canvas.height) {
+          snake.y = 0;
+        }
+
+        snake.cells.unshift({x: snake.x, y: snake.y});
+        if(snake.cells.length > snake.maxCells) {
+          snake.cells.pop();
+        }
+
+        ctx.fillStyle = 'red';
+        ctx.fillRect(food.x, food.y, grid-1, grid-1);
+
+        ctx.fillStyle = 'green';
+        snake.cells.forEach(function(cell, index) {
+          ctx.fillRect(cell.x, cell.y, grid-1, grid-1);
+          for(var i = index + 1; i < snake.cells.length; i++) {
+            if(cell.x === snake.cells[i].x && cell.y === snake.cells[i].y){
+              snake.x = 160;
+              snake.y = 160;
+              snake.cells = [];
+              snake.maxCells = 4;
+              dx = grid;
+              dy = 0;
+            }
+          }
+          if(cell.x === food.x && cell.y === food.y){
+            snake.maxCells++;
+            food.x = getRandomInt(0, canvas.width / grid) * grid;
+            food.y = getRandomInt(0, canvas.height / grid) * grid;
+          }
+        });
+      }
+
+      document.addEventListener('keydown', function(e) {
+        if(e.which === 37 && dx === 0) {
+          dx = -grid;
+          dy = 0;
+        } else if(e.which === 38 && dy === 0) {
+          dx = 0;
+          dy = -grid;
+        } else if(e.which === 39 && dx === 0) {
+          dx = grid;
+          dy = 0;
+        } else if(e.which === 40 && dy === 0) {
+          dx = 0;
+          dy = grid;
+        }
+      });
+
+      requestAnimationFrame(gameLoop);
+    }
+  </script>
+</body>
+</html>

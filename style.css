@@ -1,0 +1,147 @@
+/* Google Font: Montserrat */
+body {
+  font-family: 'Montserrat', sans-serif;
+  background: radial-gradient(circle at center, #ffffff, #f0faff, #e6f7ff);
+  color: #333;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  transition: background 0.5s ease;
+}
+
+header h1 {
+  background-color: rgba(0, 51, 102, 0.85);
+  color: #fff;
+  padding: 20px;
+  margin: 0;
+  font-size: 2.5em;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  transition: transform 0.3s ease;
+}
+
+header h1:hover {
+  transform: scale(1.02);
+}
+
+#welcome {
+  margin: 30px auto;
+  padding: 20px;
+}
+
+.logo {
+  display: block;
+  margin: 20px auto;
+  max-width: 60%;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  transition: transform 0.3s ease;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+}
+
+.button-container {
+  margin-top: 20px;
+}
+
+button {
+  background-color: #27ae60;
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  font-size: 1.2em;
+  cursor: pointer;
+  margin: 10px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+  background-color: #2ecc71;
+  transform: scale(1.05);
+}
+
+#name-form-section, #quiz, #results {
+  margin: 30px auto;
+  padding: 20px;
+  background-color: rgba(255,255,255,0.95);
+  border-radius: 10px;
+  width: 90%;
+  max-width: 600px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.answers {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.answer-option {
+  margin: 5px 10px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.answer-option input[type="radio"] {
+  margin-right: 5px;
+}
+
+table {
+  margin: 20px auto;
+  border-collapse: collapse;
+  width: 90%;
+  max-width: 500px;
+}
+
+th, td {
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+
+.results-buttons {
+  margin-top: 20px;
+}
+
+footer {
+  background-color: rgba(0, 51, 102, 0.85);
+  color: #fff;
+  padding: 10px;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+}
+
+#progress-circle {
+  margin: 20px auto;
+  position: relative;
+  width: 150px;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#progress-ring {
+  transition: stroke-dashoffset 0.5s ease;
+}
+
+#progress-text {
+  position: absolute;
+  font-size: 1.5em;
+  color: #27ae60;
+}
+
+#results-table-container {
+  margin-top: 30px;
+}
