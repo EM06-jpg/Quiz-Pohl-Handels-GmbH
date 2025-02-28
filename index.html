@@ -562,6 +562,12 @@
         ? 'Erstellt am 26.02.2025 von Emmanuel Moskios'
         : 'Created on 26.02.2025 by Emmanuel Moskios';
       renderChart();
+      // Falls Ergebnisse sichtbar sind, Tabelle und Leaderboard neu generieren
+      if(document.getElementById("results").style.display === "block") {
+        displayResultsTable();
+        displayLeaderboard();
+      }
+      // Aktualisiere auch die aktuelle Frage, falls Quiz aktiv
       if(document.getElementById("quiz").style.display === "block") {
         displayQuestion();
       }
@@ -720,7 +726,11 @@
 
     function displayResultsTable(){
       let html = `<table border="1" cellspacing="0" cellpadding="5">
-                    <tr><th>${currentLanguage === 'de' ? "Name" : "Name"}</th><th>${currentLanguage === 'de' ? "Punkte" : "Score"}</th><th>${currentLanguage === 'de' ? "Zeit" : "Time"}</th></tr>`;
+                  <tr>
+                    <th>${currentLanguage === 'de' ? "Name" : "Name"}</th>
+                    <th>${currentLanguage === 'de' ? "Punkte" : "Score"}</th>
+                    <th>${currentLanguage === 'de' ? "Zeit" : "Time"}</th>
+                  </tr>`;
       resultsArray.forEach(res => {
         html += `<tr>
                    <td>${res.name}</td>
@@ -740,7 +750,11 @@
         return b.score - a.score;
       }).slice(0,5);
       let html = `<table border="1" cellspacing="0" cellpadding="5">
-                    <tr><th>${currentLanguage === 'de' ? "Name" : "Name"}</th><th>${currentLanguage === 'de' ? "Punkte" : "Score"}</th><th>${currentLanguage === 'de' ? "Zeit" : "Time"}</th></tr>`;
+                  <tr>
+                    <th>${currentLanguage === 'de' ? "Name" : "Name"}</th>
+                    <th>${currentLanguage === 'de' ? "Punkte" : "Score"}</th>
+                    <th>${currentLanguage === 'de' ? "Zeit" : "Time"}</th>
+                  </tr>`;
       sorted.forEach(res => {
         html += `<tr>
                    <td>${res.name}</td>
