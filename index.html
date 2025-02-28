@@ -118,7 +118,7 @@
       bottom: 0;
       width: 100%;
       text-align: center;
-      z-index: 900; /* Footer liegt unter den Buttons */
+      z-index: 900; /* Footer liegt unter den fixierten Buttons */
     }
     /* Fortschrittsanzeige */
     #progress-container {
@@ -190,6 +190,25 @@
       border-radius: 5px;
       z-index: 1000;
     }
+    /* Animationen für Antworten */
+    .correct-answer {
+      animation: correctAnimation 0.5s ease;
+    }
+    @keyframes correctAnimation {
+      0% { background-color: transparent; }
+      50% { background-color: #d4edda; }
+      100% { background-color: transparent; }
+    }
+    .incorrect-answer {
+      animation: incorrectAnimation 0.5s ease;
+    }
+    @keyframes incorrectAnimation {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      50% { transform: translateX(10px); }
+      75% { transform: translateX(-10px); }
+      100% { transform: translateX(0); }
+    }
     /* Easter Egg */
     #easter-egg {
       display: none;
@@ -228,7 +247,7 @@
       #progress-text {
         font-size: 1.2em;
       }
-      /* Hier die fixierten Buttons etwas höher legen, damit sie den Footer nicht überdecken */
+      /* Fixierte Buttons etwas höher legen, damit sie den Footer nicht verdecken */
       #mode-toggle, #mini-game-btn {
         bottom: 70px;
       }
@@ -662,7 +681,7 @@
       });
       html += "</div>";
       document.getElementById("question-container").innerHTML = html;
-      
+
       // Im Schnellmodus: 5-Sekunden-Timer pro Frage
       if(isFastMode){
         fastModeTimer = setTimeout(nextQuestion, 5000);
@@ -1060,4 +1079,3 @@
   <audio id="yay-sound" src="Yaaaay-Sound.mp3"></audio>
 </body>
 </html>
-
