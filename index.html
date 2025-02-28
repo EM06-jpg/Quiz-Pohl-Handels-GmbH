@@ -6,6 +6,10 @@
   <title>Quiz der Pohl-Handels GmbH</title>
   <!-- Google Font: Montserrat -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <!-- Chart.js für Diagramme -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Konfetti-Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
   <style>
     /* Basis – Originales Design */
     body {
@@ -17,6 +21,7 @@
       text-align: center;
       transition: background 0.5s ease;
     }
+    /* Header */
     header h1 {
       background-color: rgba(0, 51, 102, 0.85);
       color: #fff;
@@ -30,7 +35,7 @@
       transform: scale(1.02);
     }
     /* Bereiche */
-    #login, #welcome, #name-form-section, #quiz, #results {
+    #login, #welcome, #name-form-section, #mode-selection, #quiz, #results {
       margin: 30px auto;
       padding: 20px;
       background-color: rgba(255,255,255,0.95);
@@ -44,6 +49,7 @@
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
+    /* Logo */
     .logo {
       display: block;
       margin: 20px auto;
@@ -74,6 +80,7 @@
       background-color: #2ecc71;
       transform: scale(1.05);
     }
+    /* Antworten */
     .answers {
       display: flex;
       flex-wrap: wrap;
@@ -88,6 +95,7 @@
     .answer-option input[type="radio"] {
       margin-right: 5px;
     }
+    /* Tabellen */
     table {
       margin: 20px auto;
       border-collapse: collapse;
@@ -101,6 +109,7 @@
     .results-buttons {
       margin-top: 20px;
     }
+    /* Footer */
     footer {
       background-color: rgba(0, 51, 102, 0.85);
       color: #fff;
@@ -110,20 +119,7 @@
       width: 100%;
       text-align: center;
     }
-    /* Zusätzliche Features */
-    /* Timer – oben rechts */
-    #stopwatch {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      background: rgba(0,0,0,0.6);
-      color: #fff;
-      padding: 5px 10px;
-      border-radius: 5px;
-      font-size: 1.2em;
-      display: none;
-    }
-    /* Fortschrittsbalken */
+    /* Fortschrittsanzeige */
     #progress-container {
       width: 90%;
       max-width: 600px;
@@ -139,7 +135,6 @@
       background-color: #e74c3c;
       transition: width 0.5s ease, background-color 0.5s ease;
     }
-    /* Donut-Kreis */
     #progress-circle {
       margin: 20px auto;
       position: relative;
@@ -163,7 +158,7 @@
     #results-table-container {
       margin-top: 30px;
     }
-    /* Dark/Light Mode Toggle – unten rechts */
+    /* Dark/Light Mode Toggle & Mini Game Button */
     #mode-toggle {
       position: fixed;
       bottom: 20px;
@@ -181,7 +176,6 @@
     #mode-toggle:hover {
       background-color: #2ecc71;
     }
-    /* Mini Game Button – unten links */
     #mini-game-btn {
       position: fixed;
       bottom: 20px;
@@ -207,42 +201,7 @@
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     }
-    /* Animationen */
-    .fade-in {
-      animation: fadeInQuestion 0.5s ease;
-    }
-    @keyframes fadeInQuestion {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .correct-answer {
-      animation: correctAnimation 0.5s ease;
-    }
-    @keyframes correctAnimation {
-      0% { background-color: transparent; }
-      50% { background-color: #d4edda; }
-      100% { background-color: transparent; }
-    }
-    .incorrect-answer {
-      animation: incorrectAnimation 0.5s ease;
-    }
-    @keyframes incorrectAnimation {
-      0% { transform: translateX(0); }
-      25% { transform: translateX(-10px); }
-      50% { transform: translateX(10px); }
-      75% { transform: translateX(-10px); }
-      100% { transform: translateX(0); }
-    }
-    /* Leaderboard */
-    #leaderboard {
-      margin-top: 20px;
-    }
-    #leaderboard table {
-      margin: 10px auto;
-      width: 90%;
-      max-width: 400px;
-    }
-    /* Responsive Anpassungen */
+    /* Responsive */
     @media (max-width: 600px) {
       header h1 {
         font-size: 2em;
@@ -253,11 +212,7 @@
         font-size: 1em;
         margin: 5px;
       }
-      #stopwatch {
-        font-size: 1em;
-        padding: 4px 8px;
-      }
-      #login, #welcome, #name-form-section, #quiz, #results {
+      #login, #welcome, #name-form-section, #mode-selection, #quiz, #results {
         padding: 15px;
         width: 95%;
         margin: 15px auto;
@@ -284,6 +239,7 @@
     .dark-mode #login,
     .dark-mode #welcome,
     .dark-mode #name-form-section,
+    .dark-mode #mode-selection,
     .dark-mode #quiz,
     .dark-mode #results {
       background-color: #34495e;
@@ -302,113 +258,8 @@
       background-color: #e67e22;
     }
   </style>
-  <!-- Konfetti-Library -->
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-</head>
-<body>
-  <!-- Login-Bereich -->
-  <section id="login">
-    <h2>Login – Nur für Mitarbeiter</h2>
-    <form id="login-form" onsubmit="loginUser(event)">
-      <input type="text" id="login-username" placeholder="Benutzername" required>
-      <br><br>
-      <input type="password" id="login-password" placeholder="Passwort" required>
-      <br><br>
-      <button type="submit">Einloggen</button>
-    </form>
-  </section>
-
-  <header style="display:none;">
-    <h1 id="header-title">Willkommen beim Quiz der Pohl-Handels GmbH!</h1>
-    <div id="stopwatch">00:00</div>
-  </header>
-
-  <main style="display:none;">
-    <!-- Willkommensbereich -->
-    <section id="welcome">
-      <img src="Pohl-Logo.png" alt="Pohl Handels GmbH Logo" class="logo">
-      <div class="button-container">
-        <button onclick="startQuiz()">Zum Quiz!</button>
-        <button onclick="showResultsSection()">Zu den Ergebnissen</button>
-      </div>
-    </section>
-    <!-- Namenseingabe -->
-    <section id="name-form-section" style="display:none;">
-      <h2>Gib bitte deinen Namen ein, um zu starten:</h2>
-      <form id="name-input-form" onsubmit="startQuizQuestions(event)">
-        <input type="text" id="name" placeholder="Dein Name" required>
-        <button type="submit">Starten</button>
-      </form>
-    </section>
-    <!-- Quizbereich -->
-    <section id="quiz" style="display:none;">
-      <!-- Fortschrittsbalken -->
-      <div id="progress-container">
-        <div id="progress-bar"></div>
-      </div>
-      <div id="question-container">
-        <!-- Fragen werden hier dynamisch erzeugt -->
-      </div>
-      <button id="next-btn" onclick="nextQuestion()">Weiter</button>
-    </section>
-    <!-- Ergebnisanzeige -->
-    <section id="results" style="display:none;">
-      <h2>Ergebnisse:</h2>
-      <p id="score"></p>
-      <div id="badge"></div>
-      <!-- Donut-Kreis -->
-      <div id="progress-circle">
-        <svg width="150" height="150">
-          <circle class="progress-bg" cx="75" cy="75" r="65" stroke="#e74c3c" stroke-width="10" fill="none"/>
-          <circle id="progress-ring" cx="75" cy="75" r="65" stroke="#27ae60" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="408" stroke-dashoffset="408"/>
-        </svg>
-        <div id="progress-text">0%</div>
-      </div>
-      <!-- Social Share Buttons -->
-      <div id="social-share">
-        <p>Teile dein Ergebnis:</p>
-        <button onclick="shareResult('twitter')">Twitter</button>
-        <button onclick="shareResult('facebook')">Facebook</button>
-        <button onclick="shareResult('whatsapp')">WhatsApp</button>
-      </div>
-      <div id="results-table-container"></div>
-      <!-- Leaderboard -->
-      <div id="leaderboard">
-        <h3>Leaderboard</h3>
-        <div id="leaderboard-table"></div>
-      </div>
-      <div class="results-buttons">
-        <button onclick="backToWelcome()">Zurück</button>
-        <button onclick="resetResults()">Ergebnisse zurücksetzen</button>
-      </div>
-    </section>
-    <!-- Easter Egg -->
-    <div id="easter-egg">Überraschung! Du hast das Easter Egg gefunden!</div>
-  </main>
-
-  <!-- Dark/Light Mode Toggle – unten rechts -->
-  <button id="mode-toggle" onclick="toggleMode()">Dark/Light Mode</button>
-  <!-- Mini Game Button – unten links -->
-  <button id="mini-game-btn" onclick="openSnakeGame()">Mini Game: Snake</button>
-
-  <footer style="display:none;">
-    <p>Erstellt am 26.02.2025 von Emmanuel Moskios</p>
-  </footer>
-
-  <!-- Snake Game Modal -->
-  <div id="snake-modal" style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;">
-    <div style="position: relative; background: #fff; padding: 20px; border-radius: 10px;">
-      <button onclick="closeSnakeGame()" style="position:absolute; top:10px; right:10px;">Schließen</button>
-      <canvas id="snake-canvas" width="400" height="400" style="border:1px solid #000;"></canvas>
-    </div>
-  </div>
-
-  <!-- Soundeffekte – verwende die heruntergeladenen MP3-Dateien -->
-  <audio id="correct-sound" src="correct-Sound.mp3"></audio>
-  <audio id="incorrect-sound" src="incorrect-Sound.mp3"></audio>
-  <audio id="yay-sound" src="Yaaaay-Sound.mp3"></audio>
-
   <script>
+    // Globale Variablen
     let currentQuestionIndex = 0;
     let score = 0;
     let currentUserName = "";
@@ -417,33 +268,304 @@
     let startTime = null;
     let elapsedTime = 0;
     let headerClicks = 0;
+    let currentLanguage = 'de';
+    let isFastMode = false;
+    let fastModeTimer = null;
 
     if(localStorage.getItem("quizResults")){
       resultsArray = JSON.parse(localStorage.getItem("quizResults"));
     }
 
+    // Fragen-Array
     const questions = [
-      { question: "1. In welchem Jahr wurde die Pohl Handels GmbH gegründet?", answers: ["2010", "2013", "2015", "2018"], correct: 1 },
-      { question: "2. In welchem Jahr wurde der Online-Shop der Pohl Handels GmbH erstmals gelauncht?", answers: ["2015", "2016", "2017", "2018"], correct: 1 },
-      { question: "3. Welches Zahlungsmittel wird im Online-Shop der Pohl Handels GmbH am häufigsten genutzt?", answers: ["Kreditkarte", "PayPal", "Apple Pay", "Google Pay"], correct: 0 },
-      { question: "4. Liefert die Pohl Handels GmbH international?", answers: ["Ja", "Nein"], correct: 0 },
-      { question: "5. Wie viele Online-Shops betreibt die Pohl Handels GmbH?", answers: ["1", "2", "3", "5"], correct: 1 },
-      { question: "6. Wie lauten die Namen der beiden Online-Shops der Pohl Handels GmbH?", answers: ["Outdoor49 und Bobleisure", "SportShop und OutdoorPlus", "Bobleisure und ShopOnline", "AdventurePro und Bobleisure"], correct: 0 },
-      { question: "7. Welche Versanddienstleister werden von der Pohl Handels GmbH genutzt?", answers: ["DHL, FedEx und UPS", "DHL und Hermes", "UPS und DPD", "Hermes und GLS"], correct: 0 },
-      { question: "8. Welche Art von Produkten verkauft die Pohl Handels GmbH hauptsächlich?", answers: ["Outdoor-Produkte", "Elektronikgeräte", "Spielzeug", "Möbel"], correct: 0 },
-      { question: "9. Welche der folgenden Zahlungsmethoden wird nicht von der Pohl Handels GmbH im Online-Shop akzeptiert?", answers: ["Kreditkarte", "PayPal", "Bitcoin", "Apple Pay"], correct: 2 },
-      { question: "10. Welche der folgenden Plattformen wird von der Pohl Handels GmbH für Werbung genutzt?", answers: ["Instagram", "LinkedIn", "TikTok", "Facebook"], correct: 3 },
-      { question: "11. Welches dieser Produkte wird NICHT von der Pohl Handels GmbH angeboten?", answers: ["Zelte", "Wanderschuhe", "Schlafsäcke", "Smartphones"], correct: 3 },
-      { question: "12. Welche Hauptsprache wird auf der Webseite der Pohl Handels GmbH verwendet?", answers: ["Deutsch", "Englisch", "Spanisch", "Französisch"], correct: 1 },
-      { question: "13. Welche Zielgruppe spricht die Pohl Handels GmbH hauptsächlich an?", answers: ["Outdoor-Enthusiasten", "Haustierbesitzer", "Hobbyköche", "Technikliebhaber"], correct: 0 },
-      { question: "14. Welche Outdoor-Aktivität wird durch das Produktsortiment der Pohl Handels GmbH besonders unterstützt?", answers: ["Camping & Wandern", "Motorsport", "Angeln", "Reiten"], correct: 0 },
-      { question: "15. Wo befindet sich der Firmensitz der Pohl Handels GmbH?", answers: ["Deutschland", "Österreich", "Schweiz", "Niederlande"], correct: 0 },
-      { question: "16. Wie können Kunden den Kundenservice der Pohl Handels GmbH erreichen?", answers: ["Nur per Telefon", "Per Telefon, E-Mail und Kontaktformular", "Nur über Social Media", "Persönlich im Geschäft"], correct: 1 },
-      { question: "17. Welche Versandoptionen bietet die Pohl Handels GmbH ihren Kunden an?", answers: ["Standardversand, Expressversand", "Expressversand", "Same-Day-Delivery", "Nur Abholung vor Ort"], correct: 0 },
-      { question: "18. Welche dieser Produktkategorien bietet die Pohl Handels GmbH an?", answers: ["Campingausrüstung", "Haushaltsgeräte", "Kosmetik", "Musikinstrumente"], correct: 0 },
-      { question: "19. Welche dieser Sportarten wird durch das Sortiment der Pohl Handels GmbH besonders unterstützt?", answers: ["Wandern", "Motorsport", "Tennis", "Golf"], correct: 0 },
-      { question: "20. In welcher Jahreszeit erzielt die Pohl Handels GmbH die meisten Verkäufe?", answers: ["Frühling", "Sommer", "Herbst", "Winter"], correct: 3 }
+      {
+        de: "1. In welchem Jahr wurde die Pohl Handels GmbH gegründet?",
+        en: "1. In which year was Pohl Handels GmbH founded?",
+        answers: {
+          de: ["2010", "2013", "2015", "2018"],
+          en: ["2010", "2013", "2015", "2018"]
+        },
+        correct: 1
+      },
+      {
+        de: "2. In welchem Jahr wurde der Online-Shop der Pohl Handels GmbH erstmals gelauncht?",
+        en: "2. In which year was Pohl Handels GmbH's online shop first launched?",
+        answers: {
+          de: ["2015", "2016", "2017", "2018"],
+          en: ["2015", "2016", "2017", "2018"]
+        },
+        correct: 1
+      },
+      {
+        de: "3. Welches Zahlungsmittel wird im Online-Shop der Pohl Handels GmbH am häufigsten genutzt?",
+        en: "3. Which payment method is most frequently used in the online shop?",
+        answers: {
+          de: ["Kreditkarte", "PayPal", "Apple Pay", "Google Pay"],
+          en: ["Credit Card", "PayPal", "Apple Pay", "Google Pay"]
+        },
+        correct: 0
+      },
+      {
+        de: "4. Liefert die Pohl Handels GmbH international?",
+        en: "4. Does Pohl Handels GmbH deliver internationally?",
+        answers: {
+          de: ["Ja", "Nein"],
+          en: ["Yes", "No"]
+        },
+        correct: 0
+      },
+      {
+        de: "5. Wie viele Online-Shops betreibt die Pohl Handels GmbH?",
+        en: "5. How many online shops does Pohl Handels GmbH operate?",
+        answers: {
+          de: ["1", "2", "3", "5"],
+          en: ["1", "2", "3", "5"]
+        },
+        correct: 1
+      },
+      {
+        de: "6. Wie lauten die Namen der beiden Online-Shops der Pohl Handels GmbH?",
+        en: "6. What are the names of the two online shops of Pohl Handels GmbH?",
+        answers: {
+          de: ["Outdoor49 und Bobleisure", "SportShop und OutdoorPlus", "Bobleisure und ShopOnline", "AdventurePro und Bobleisure"],
+          en: ["Outdoor49 and Bobleisure", "SportShop and OutdoorPlus", "Bobleisure and ShopOnline", "AdventurePro and Bobleisure"]
+        },
+        correct: 0
+      },
+      {
+        de: "7. Welche Versanddienstleister werden von der Pohl Handels GmbH genutzt?",
+        en: "7. Which shipping services are used by Pohl Handels GmbH?",
+        answers: {
+          de: ["DHL, FedEx und UPS", "DHL und Hermes", "UPS und DPD", "Hermes und GLS"],
+          en: ["DHL, FedEx and UPS", "DHL and Hermes", "UPS and DPD", "Hermes and GLS"]
+        },
+        correct: 0
+      },
+      {
+        de: "8. Welche Art von Produkten verkauft die Pohl Handels GmbH hauptsächlich?",
+        en: "8. What type of products does Pohl Handels GmbH mainly sell?",
+        answers: {
+          de: ["Outdoor-Produkte", "Elektronikgeräte", "Spielzeug", "Möbel"],
+          en: ["Outdoor products", "Electronics", "Toys", "Furniture"]
+        },
+        correct: 0
+      },
+      {
+        de: "9. Welche der folgenden Zahlungsmethoden wird nicht von der Pohl Handels GmbH im Online-Shop akzeptiert?",
+        en: "9. Which of the following payment methods is not accepted in the online shop?",
+        answers: {
+          de: ["Kreditkarte", "PayPal", "Bitcoin", "Apple Pay"],
+          en: ["Credit Card", "PayPal", "Bitcoin", "Apple Pay"]
+        },
+        correct: 2
+      },
+      {
+        de: "10. Welche der folgenden Plattformen wird von der Pohl Handels GmbH für Werbung genutzt?",
+        en: "10. Which of the following platforms is used by Pohl Handels GmbH for advertising?",
+        answers: {
+          de: ["Instagram", "LinkedIn", "TikTok", "Facebook"],
+          en: ["Instagram", "LinkedIn", "TikTok", "Facebook"]
+        },
+        correct: 3
+      },
+      {
+        de: "11. Welches dieser Produkte wird NICHT von der Pohl Handels GmbH angeboten?",
+        en: "11. Which of these products is NOT offered by Pohl Handels GmbH?",
+        answers: {
+          de: ["Zelte", "Wanderschuhe", "Schlafsäcke", "Smartphones"],
+          en: ["Tents", "Hiking boots", "Sleeping bags", "Smartphones"]
+        },
+        correct: 3
+      },
+      {
+        de: "12. Welche Hauptsprache wird auf der Webseite der Pohl Handels GmbH verwendet?",
+        en: "12. What is the primary language used on Pohl Handels GmbH's website?",
+        answers: {
+          de: ["Deutsch", "Englisch", "Spanisch", "Französisch"],
+          en: ["German", "English", "Spanish", "French"]
+        },
+        correct: 1
+      },
+      {
+        de: "13. Welche Zielgruppe spricht die Pohl Handels GmbH hauptsächlich an?",
+        en: "13. Which target audience does Pohl Handels GmbH primarily address?",
+        answers: {
+          de: ["Outdoor-Enthusiasten", "Haustierbesitzer", "Hobbyköche", "Technikliebhaber"],
+          en: ["Outdoor enthusiasts", "Pet owners", "Cooking hobbyists", "Tech lovers"]
+        },
+        correct: 0
+      },
+      {
+        de: "14. Welche Outdoor-Aktivität wird durch das Produktsortiment der Pohl Handels GmbH besonders unterstützt?",
+        en: "14. Which outdoor activity is particularly supported by Pohl Handels GmbH's product range?",
+        answers: {
+          de: ["Camping & Wandern", "Motorsport", "Angeln", "Reiten"],
+          en: ["Camping & Hiking", "Motorsports", "Fishing", "Riding"]
+        },
+        correct: 0
+      },
+      {
+        de: "15. Wo befindet sich der Firmensitz der Pohl Handels GmbH?",
+        en: "15. Where is the headquarters of Pohl Handels GmbH located?",
+        answers: {
+          de: ["Deutschland", "Österreich", "Schweiz", "Niederlande"],
+          en: ["Germany", "Austria", "Switzerland", "Netherlands"]
+        },
+        correct: 0
+      },
+      {
+        de: "16. Wie können Kunden den Kundenservice der Pohl Handels GmbH erreichen?",
+        en: "16. How can customers reach Pohl Handels GmbH's customer service?",
+        answers: {
+          de: ["Nur per Telefon", "Per Telefon, E-Mail und Kontaktformular", "Nur über Social Media", "Persönlich im Geschäft"],
+          en: ["By phone only", "By phone, email and contact form", "Only via social media", "In person at the store"]
+        },
+        correct: 1
+      },
+      {
+        de: "17. Welche Versandoptionen bietet die Pohl Handels GmbH ihren Kunden an?",
+        en: "17. Which shipping options does Pohl Handels GmbH offer its customers?",
+        answers: {
+          de: ["Standardversand, Expressversand", "Expressversand", "Same-Day-Delivery", "Nur Abholung vor Ort"],
+          en: ["Standard and express shipping", "Express shipping", "Same-day delivery", "In-store pickup only"]
+        },
+        correct: 0
+      },
+      {
+        de: "18. Welche dieser Produktkategorien bietet die Pohl Handels GmbH an?",
+        en: "18. Which of these product categories does Pohl Handels GmbH offer?",
+        answers: {
+          de: ["Campingausrüstung", "Haushaltsgeräte", "Kosmetik", "Musikinstrumente"],
+          en: ["Camping equipment", "Home appliances", "Cosmetics", "Musical instruments"]
+        },
+        correct: 0
+      },
+      {
+        de: "19. Welche dieser Sportarten wird durch das Sortiment der Pohl Handels GmbH besonders unterstützt?",
+        en: "19. Which of these sports is particularly supported by Pohl Handels GmbH's product range?",
+        answers: {
+          de: ["Wandern", "Motorsport", "Tennis", "Golf"],
+          en: ["Hiking", "Motorsports", "Tennis", "Golf"]
+        },
+        correct: 0
+      },
+      {
+        de: "20. In welcher Jahreszeit erzielt die Pohl Handels GmbH die meisten Verkäufe?",
+        en: "20. In which season does Pohl Handels GmbH achieve the highest sales?",
+        answers: {
+          de: ["Frühling", "Sommer", "Herbst", "Winter"],
+          en: ["Spring", "Summer", "Autumn", "Winter"]
+        },
+        correct: 3
+      }
     ];
+
+    // Animierte Fortschrittsanzeige
+    function animateProgressCircle(percentage) {
+      const circle = document.getElementById("progress-ring");
+      const text = document.getElementById("progress-text");
+      const radius = circle.r.baseVal.value;
+      const circumference = 2 * Math.PI * radius;
+      circle.style.strokeDasharray = circumference;
+      const duration = 1000;
+      const start = performance.now();
+      function animate(now) {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        const currentPercentage = percentage * progress;
+        const offset = circumference - (currentPercentage / 100) * circumference;
+        circle.style.strokeDashoffset = offset;
+        text.textContent = `${Math.round(currentPercentage)}%`;
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+
+    // Diagramm mit Chart.js rendern
+    function renderChart() {
+      const ctx = document.getElementById('progressChart').getContext('2d');
+      const labels = resultsArray.map((res, i) => `Quiz ${i+1}`);
+      const scores = resultsArray.map(res => res.score);
+      if(window.myChart) {
+        window.myChart.destroy();
+      }
+      window.myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: currentLanguage === 'de' ? 'Punkte' : 'Score',
+            data: scores,
+            borderColor: '#27ae60',
+            backgroundColor: 'rgba(39, 174, 96, 0.2)',
+            fill: true,
+            tension: 0.1
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: questions.length
+            }
+          }
+        }
+      });
+    }
+
+    // Sprach-Toggle Funktion
+    function toggleLanguage() {
+      currentLanguage = currentLanguage === 'de' ? 'en' : 'de';
+      document.getElementById('header-title').textContent = currentLanguage === 'de'
+        ? 'Willkommen beim Quiz der Pohl-Handels GmbH!'
+        : 'Welcome to the Quiz of Pohl-Handels GmbH!';
+      document.getElementById('login-title').textContent = currentLanguage === 'de'
+        ? 'Login – Nur für Mitarbeiter'
+        : 'Login – For Employees Only';
+      document.getElementById('login-btn').textContent = currentLanguage === 'de'
+        ? 'Einloggen'
+        : 'Log In';
+      document.getElementById('welcome-btn').textContent = currentLanguage === 'de'
+        ? 'Zum Quiz!'
+        : 'Start Quiz!';
+      document.getElementById('results-btn').textContent = currentLanguage === 'de'
+        ? 'Zu den Ergebnissen'
+        : 'View Results';
+      document.getElementById('name-form-title').textContent = currentLanguage === 'de'
+        ? 'Gib bitte deinen Namen ein, um zu starten:'
+        : 'Enter your name to begin:';
+      document.getElementById('start-btn').textContent = currentLanguage === 'de'
+        ? 'Starten'
+        : 'Start';
+      document.getElementById('mode-selection-title').textContent = currentLanguage === 'de'
+        ? 'Wähle den Modus:'
+        : 'Choose the mode:';
+      document.getElementById('results-title').textContent = currentLanguage === 'de'
+        ? 'Ergebnisse:'
+        : 'Results:';
+      document.getElementById('share-text').textContent = currentLanguage === 'de'
+        ? 'Teile dein Ergebnis:'
+        : 'Share your result:';
+      document.getElementById('next-btn').textContent = currentLanguage === 'de'
+        ? 'Weiter'
+        : 'Next';
+      document.getElementById('back-btn').textContent = currentLanguage === 'de'
+        ? 'Zurück'
+        : 'Back';
+      document.getElementById('reset-btn').textContent = currentLanguage === 'de'
+        ? 'Ergebnisse zurücksetzen'
+        : 'Reset Results';
+      document.getElementById('footer-text').textContent = currentLanguage === 'de'
+        ? 'Erstellt am 26.02.2025 von Emmanuel Moskios'
+        : 'Created on 26.02.2025 by Emmanuel Moskios';
+      renderChart();
+      if(document.getElementById("quiz").style.display === "block") {
+        displayQuestion();
+      }
+    }
 
     // Login-Funktion
     function loginUser(event){
@@ -456,19 +578,33 @@
         document.querySelector("main").style.display = "block";
         document.querySelector("footer").style.display = "block";
       } else {
-        alert("Falsche Zugangsdaten!");
+        alert(currentLanguage === 'de' ? "Falsche Zugangsdaten!" : "Wrong credentials!");
       }
     }
 
+    // Start des Quiz: vom Willkommensbildschirm zur Namenseingabe
     function startQuiz(){
       document.getElementById("welcome").style.display = "none";
       document.getElementById("name-form-section").style.display = "block";
     }
 
+    // Nach der Namenseingabe: Zeige Modus-Auswahl
     function startQuizQuestions(event){
       event.preventDefault();
       currentUserName = document.getElementById("name").value;
       document.getElementById("name-form-section").style.display = "none";
+      document.getElementById("mode-selection").style.display = "block";
+    }
+
+    // Auswahl des Modus
+    function selectMode(isFast){
+      isFastMode = isFast;
+      document.getElementById("mode-selection").style.display = "none";
+      startQuizWithMode();
+    }
+
+    // Quiz starten
+    function startQuizWithMode(){
       document.getElementById("quiz").style.display = "block";
       document.getElementById("stopwatch").style.display = "block";
       startTime = Date.now();
@@ -504,8 +640,10 @@
 
     function displayQuestion(){
       const q = questions[currentQuestionIndex];
-      let html = `<h2 class="fade-in">${q.question}</h2><div class="answers fade-in">`;
-      q.answers.forEach((ans, idx) => {
+      const questionText = currentLanguage === 'de' ? q.de : q.en;
+      let html = `<h2 class="fade-in">${questionText}</h2><div class="answers fade-in">`;
+      const answers = currentLanguage === 'de' ? q.answers.de : q.answers.en;
+      answers.forEach((ans, idx) => {
         html += `<span class="answer-option">
                    <input type="radio" name="answer" value="${idx}" id="answer${idx}">
                    <label for="answer${idx}">${ans}</label>
@@ -513,17 +651,31 @@
       });
       html += "</div>";
       document.getElementById("question-container").innerHTML = html;
+
+      // Im Schnellmodus: 5-Sekunden-Timer pro Frage
+      if(isFastMode){
+        fastModeTimer = setTimeout(nextQuestion, 5000);
+      }
     }
 
     function nextQuestion(){
       const selected = document.querySelector('input[name="answer"]:checked');
-      if(selected){
-        const idx = parseInt(selected.value);
-        if(idx === questions[currentQuestionIndex].correct){
-          score++;
-          document.getElementById("correct-sound").play();
-          document.getElementById("question-container").classList.add("correct-answer");
-        } else {
+      if(selected || isFastMode) {
+        if(fastModeTimer){
+          clearTimeout(fastModeTimer);
+          fastModeTimer = null;
+        }
+        if(selected){
+          const idx = parseInt(selected.value);
+          if(idx === questions[currentQuestionIndex].correct){
+            score++;
+            document.getElementById("correct-sound").play();
+            document.getElementById("question-container").classList.add("correct-answer");
+          } else {
+            document.getElementById("incorrect-sound").play();
+            document.getElementById("question-container").classList.add("incorrect-answer");
+          }
+        } else if(isFastMode){
           document.getElementById("incorrect-sound").play();
           document.getElementById("question-container").classList.add("incorrect-answer");
         }
@@ -538,7 +690,7 @@
           }
         }, 500);
       } else {
-        alert("Bitte wähle eine Antwort aus!");
+        alert(currentLanguage === 'de' ? "Bitte wähle eine Antwort aus!" : "Please select an answer!");
       }
     }
 
@@ -547,38 +699,28 @@
       document.getElementById("quiz").style.display = "none";
       document.getElementById("results").style.display = "block";
       let finalTime = formatTime(elapsedTime);
-      document.getElementById("score").innerHTML = `Hallo ${currentUserName}, du hast ${score} von ${questions.length} Fragen richtig beantwortet!<br>Deine Zeit: ${finalTime}`;
-
+      document.getElementById("score").innerHTML = currentLanguage === 'de'
+        ? `Hallo ${currentUserName}, du hast ${score} von ${questions.length} Fragen richtig beantwortet!<br>Deine Zeit: ${finalTime}`
+        : `Hello ${currentUserName}, you answered ${score} out of ${questions.length} questions correctly!<br>Your time: ${finalTime}`;
       if(score === questions.length){
-        document.getElementById("badge").innerHTML = `<p>Glückwunsch! Perfekter Score <span style="font-size:2em;">🏆</span></p>`;
+        document.getElementById("badge").innerHTML = `<p>${currentLanguage === 'de' ? "Glückwunsch! Perfekter Score" : "Congratulations! Perfect Score"} <span style="font-size:2em;">🏆</span></p>`;
       } else {
         document.getElementById("badge").innerHTML = "";
       }
-
       resultsArray.push({name: currentUserName, score: score, time: finalTime});
       localStorage.setItem("quizResults", JSON.stringify(resultsArray));
-      updateProgressCircle();
+      const percentage = (score / questions.length) * 100;
+      animateProgressCircle(percentage);
       displayResultsTable();
       displayLeaderboard();
+      renderChart();
       confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
       document.getElementById("yay-sound").play();
     }
 
-    function updateProgressCircle(){
-      const percentage = (score / questions.length) * 100;
-      const circle = document.getElementById("progress-ring");
-      const text = document.getElementById("progress-text");
-      const radius = circle.r.baseVal.value;
-      const circumference = 2 * Math.PI * radius;
-      circle.style.strokeDasharray = circumference;
-      const offset = circumference - (percentage / 100) * circumference;
-      circle.style.strokeDashoffset = offset;
-      text.textContent = `${Math.round(percentage)}%`;
-    }
-
     function displayResultsTable(){
       let html = `<table border="1" cellspacing="0" cellpadding="5">
-                  <tr><th>Name</th><th>Punkte</th><th>Zeit</th></tr>`;
+                    <tr><th>${currentLanguage === 'de' ? "Name" : "Name"}</th><th>${currentLanguage === 'de' ? "Punkte" : "Score"}</th><th>${currentLanguage === 'de' ? "Zeit" : "Time"}</th></tr>`;
       resultsArray.forEach(res => {
         html += `<tr>
                    <td>${res.name}</td>
@@ -598,7 +740,7 @@
         return b.score - a.score;
       }).slice(0,5);
       let html = `<table border="1" cellspacing="0" cellpadding="5">
-                  <tr><th>Name</th><th>Punkte</th><th>Zeit</th></tr>`;
+                    <tr><th>${currentLanguage === 'de' ? "Name" : "Name"}</th><th>${currentLanguage === 'de' ? "Punkte" : "Score"}</th><th>${currentLanguage === 'de' ? "Zeit" : "Time"}</th></tr>`;
       sorted.forEach(res => {
         html += `<tr>
                    <td>${res.name}</td>
@@ -613,6 +755,7 @@
     function showResultsSection(){
       document.getElementById("welcome").style.display = "none";
       document.getElementById("name-form-section").style.display = "none";
+      document.getElementById("mode-selection").style.display = "none";
       document.getElementById("quiz").style.display = "none";
       if(localStorage.getItem("quizResults")){
         resultsArray = JSON.parse(localStorage.getItem("quizResults"));
@@ -620,6 +763,7 @@
       displayResultsTable();
       displayLeaderboard();
       document.getElementById("results").style.display = "block";
+      renderChart();
     }
 
     function backToWelcome(){
@@ -634,15 +778,21 @@
     }
 
     function resetResults(){
-      const pass = prompt("Bitte geben Sie das Host-Passwort ein:");
+      const pass = prompt(currentLanguage === 'de'
+        ? "Bitte geben Sie das Host-Passwort ein:"
+        : "Please enter the host password:");
       if(pass === "hostpass"){
         resultsArray = [];
         localStorage.setItem("quizResults", JSON.stringify(resultsArray));
         displayResultsTable();
         displayLeaderboard();
-        alert("Ergebnisse wurden zurückgesetzt!");
+        alert(currentLanguage === 'de'
+          ? "Ergebnisse wurden zurückgesetzt!"
+          : "Results have been reset!");
       } else {
-        alert("Falsches Passwort!");
+        alert(currentLanguage === 'de'
+          ? "Falsches Passwort!"
+          : "Wrong password!");
       }
     }
 
@@ -678,7 +828,7 @@
       }
     }
 
-    /* Snake Game Code */
+    /* Snake Game */
     function openSnakeGame(){
       document.getElementById("snake-modal").style.display = "flex";
       startSnakeGame();
@@ -775,5 +925,119 @@
       requestAnimationFrame(gameLoop);
     }
   </script>
+</head>
+<body>
+  <!-- Sprach-Toggle Button -->
+  <button id="lang-toggle" onclick="toggleLanguage()">DE/EN</button>
+
+  <!-- Login-Bereich -->
+  <section id="login">
+    <h2 id="login-title">Login – Nur für Mitarbeiter</h2>
+    <form id="login-form" onsubmit="loginUser(event)">
+      <input type="text" id="login-username" placeholder="Benutzername" required>
+      <br><br>
+      <input type="password" id="login-password" placeholder="Passwort" required>
+      <br><br>
+      <button type="submit" id="login-btn">Einloggen</button>
+    </form>
+  </section>
+
+  <header style="display:none;">
+    <h1 id="header-title">Willkommen beim Quiz der Pohl-Handels GmbH!</h1>
+    <div id="stopwatch">00:00</div>
+  </header>
+
+  <main style="display:none;">
+    <!-- Willkommensbereich -->
+    <section id="welcome">
+      <img src="Pohl-Logo.png" alt="Pohl Handels GmbH Logo" class="logo">
+      <div class="button-container">
+        <button id="welcome-btn" onclick="startQuiz()">Zum Quiz!</button>
+        <button id="results-btn" onclick="showResultsSection()">Zu den Ergebnissen</button>
+      </div>
+    </section>
+    <!-- Namenseingabe -->
+    <section id="name-form-section" style="display:none;">
+      <h2 id="name-form-title">Gib bitte deinen Namen ein, um zu starten:</h2>
+      <form id="name-input-form" onsubmit="startQuizQuestions(event)">
+        <input type="text" id="name" placeholder="Dein Name" required>
+        <button type="submit" id="start-btn">Starten</button>
+      </form>
+    </section>
+    <!-- Modus-Auswahl -->
+    <section id="mode-selection" style="display:none;">
+      <h2 id="mode-selection-title">Wähle den Modus:</h2>
+      <button id="normal-mode-btn" onclick="selectMode(false)">Normalmodus</button>
+      <button id="fast-mode-btn" onclick="selectMode(true)">Schnellmodus</button>
+    </section>
+    <!-- Quizbereich -->
+    <section id="quiz" style="display:none;">
+      <!-- Fortschrittsbalken -->
+      <div id="progress-container">
+        <div id="progress-bar"></div>
+      </div>
+      <div id="question-container">
+        <!-- Fragen werden hier dynamisch erzeugt -->
+      </div>
+      <button id="next-btn" onclick="nextQuestion()">Weiter</button>
+    </section>
+    <!-- Ergebnisanzeige -->
+    <section id="results" style="display:none;">
+      <h2 id="results-title">Ergebnisse:</h2>
+      <p id="score"></p>
+      <div id="badge"></div>
+      <!-- Donut-Kreis -->
+      <div id="progress-circle">
+        <svg width="150" height="150">
+          <circle class="progress-bg" cx="75" cy="75" r="65" stroke="#e74c3c" stroke-width="10" fill="none"/>
+          <circle id="progress-ring" cx="75" cy="75" r="65" stroke="#27ae60" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="408" stroke-dashoffset="408"/>
+        </svg>
+        <div id="progress-text">0%</div>
+      </div>
+      <!-- Diagramm -->
+      <canvas id="progressChart" width="400" height="200"></canvas>
+      <!-- Social Share Buttons -->
+      <div id="social-share">
+        <p id="share-text">Teile dein Ergebnis:</p>
+        <button onclick="shareResult('twitter')">Twitter</button>
+        <button onclick="shareResult('facebook')">Facebook</button>
+        <button onclick="shareResult('whatsapp')">WhatsApp</button>
+      </div>
+      <div id="results-table-container"></div>
+      <!-- Leaderboard -->
+      <div id="leaderboard">
+        <h3>Leaderboard</h3>
+        <div id="leaderboard-table"></div>
+      </div>
+      <div class="results-buttons">
+        <button id="back-btn" onclick="backToWelcome()">Zurück</button>
+        <button id="reset-btn" onclick="resetResults()">Ergebnisse zurücksetzen</button>
+      </div>
+    </section>
+    <!-- Easter Egg -->
+    <div id="easter-egg">Überraschung! Du hast das Easter Egg gefunden!</div>
+  </main>
+
+  <!-- Dark/Light Mode Toggle – unten rechts -->
+  <button id="mode-toggle" onclick="toggleMode()">Dark/Light Mode</button>
+  <!-- Mini Game Button – unten links -->
+  <button id="mini-game-btn" onclick="openSnakeGame()">Mini Game: Snake</button>
+
+  <footer style="display:none;">
+    <p id="footer-text">Erstellt am 26.02.2025 von Emmanuel Moskios</p>
+  </footer>
+
+  <!-- Snake Game Modal -->
+  <div id="snake-modal" style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;">
+    <div style="position: relative; background: #fff; padding: 20px; border-radius: 10px;">
+      <button onclick="closeSnakeGame()" style="position:absolute; top:10px; right:10px;">Schließen</button>
+      <canvas id="snake-canvas" width="400" height="400" style="border:1px solid #000;"></canvas>
+    </div>
+  </div>
+
+  <!-- Audio für Soundeffekte -->
+  <audio id="correct-sound" src="correct-Sound.mp3"></audio>
+  <audio id="incorrect-sound" src="incorrect-Sound.mp3"></audio>
+  <audio id="yay-sound" src="Yaaaay-Sound.mp3"></audio>
 </body>
 </html>
