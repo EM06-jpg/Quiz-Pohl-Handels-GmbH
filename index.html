@@ -118,6 +118,7 @@
       bottom: 0;
       width: 100%;
       text-align: center;
+      z-index: 900; /* Footer liegt unter den Buttons */
     }
     /* Fortschrittsanzeige */
     #progress-container {
@@ -158,7 +159,7 @@
     #results-table-container {
       margin-top: 30px;
     }
-    /* Dark/Light Mode Toggle & Mini Game Button */
+    /* Fixierte Buttons für Dark/Light Mode und Mini Game */
     #mode-toggle {
       position: fixed;
       bottom: 20px;
@@ -187,7 +188,7 @@
       color: #fff;
       border: none;
       border-radius: 5px;
-      z-index: 10000;
+      z-index: 1000;
     }
     /* Easter Egg */
     #easter-egg {
@@ -201,7 +202,7 @@
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     }
-    /* Responsive */
+    /* Responsive Anpassungen */
     @media (max-width: 600px) {
       header h1 {
         font-size: 2em;
@@ -226,6 +227,10 @@
       }
       #progress-text {
         font-size: 1.2em;
+      }
+      /* Hier die fixierten Buttons etwas höher legen, damit sie den Footer nicht überdecken */
+      #mode-toggle, #mini-game-btn {
+        bottom: 70px;
       }
     }
     /* Dark Mode Styles */
@@ -657,7 +662,7 @@
       });
       html += "</div>";
       document.getElementById("question-container").innerHTML = html;
-
+      
       // Im Schnellmodus: 5-Sekunden-Timer pro Frage
       if(isFastMode){
         fastModeTimer = setTimeout(nextQuestion, 5000);
@@ -1055,3 +1060,4 @@
   <audio id="yay-sound" src="Yaaaay-Sound.mp3"></audio>
 </body>
 </html>
+
